@@ -1,0 +1,36 @@
+version: 2
+models:
+  - name: hub_order
+    columns:
+      - name: HUB_ORDER_KEY
+        tests:
+          - unique
+          - not_null
+  - name: hub_pizza
+    columns:
+      - name: HUB_PIZZA_KEY
+        tests:
+          - unique
+          - not_null
+  - name: lnk_order_pizza
+    columns:
+      - name: LNK_ORDER_PIZZA_KEY
+        tests:
+          - unique
+          - not_null
+      - name: HUB_ORDER_KEY
+        tests:
+          - relationships:
+              to: ref('hub_order')
+              field: HUB_ORDER_KEY
+      - name: HUB_PIZZA_KEY
+        tests:
+          - relationships:
+              to: ref('hub_pizza')
+              field: HUB_PIZZA_KEY
+  - name: sat_pizza
+    columns:
+      - name: size
+        tests:
+          - accepted_values:
+              values: [ 'S', 'M', 'L', 'XL', 'XXL' ]

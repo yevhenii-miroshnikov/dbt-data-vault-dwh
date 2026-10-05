@@ -1,0 +1,11 @@
+version: 2
+
+sources:
+  - name: source_seed_db
+    database: dbt_demo_team_a
+    schema: dbt_demo_team_a_bronze_db
+    tables:
+      - name: orders
+      - name: order_details
+      - name: pizzas
+      - name: pizza_types
