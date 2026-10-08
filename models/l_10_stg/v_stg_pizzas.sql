@@ -2,6 +2,7 @@
 source_model: 'v_src_brz_pizzas'
 derived_columns:
   RECORD_SOURCE: '!SEED_PIZZAS'
+  {# Within one dbt invocation, run_started_at provides a shared batch LDTS across staging models. #}
   LOAD_DATETIME: "'{{ run_started_at.isoformat() }}'::timestamptz"
 hashed_columns:
   HUB_PIZZA_KEY: 'pizza_id'

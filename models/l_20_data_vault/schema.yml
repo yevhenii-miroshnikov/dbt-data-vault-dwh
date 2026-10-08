@@ -44,7 +44,11 @@ models:
           - not_null
 
   - name: lnk_order_pizza
-    description: "Link representing an association between an order and a pizza SKU. The model does not guarantee a distinct transaction line-item grain."
+    description: >-
+      Link with one row per unique Order ↔ Pizza SKU association, keyed by the
+      hash of (order_id, pizza_id). The current source contract requires this
+      pair to be unique in order_details. The Link does not identify a separate
+      transaction line item.
     columns:
       - name: LNK_ORDER_PIZZA_KEY
         description: "Hash key identifying the order-to-pizza association."
@@ -163,7 +167,10 @@ models:
           - not_null
 
   - name: sat_order_pizza
-    description: "Satellite preserving historical descriptive context for an order-to-pizza association."
+    description: >-
+      Satellite preserving historical order-detail payload for an Order ↔
+      Pizza SKU association. Its parent grain is the Link hash key; the source
+      order_details_id and quantity are payload, not part of the Link key.
     data_tests:
       - dbt_utils.unique_combination_of_columns:
           arguments:
