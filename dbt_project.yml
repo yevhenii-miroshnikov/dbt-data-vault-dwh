@@ -31,9 +31,6 @@ clean-targets:         # directories to be removed by `dbt clean`
 # files using the `{{ config(...) }}` macro.
 models:
   dbt_with_datavault_demo:
-    example:
-      +materialized: view
-      +enabled: false
     l_00_brz:
       +schema: 'bronze_db'
       +materialized: view
@@ -55,6 +52,20 @@ models:
         - 'medallion_silver'
         - 'raw_vault'
       +enabled: true
+      hub_order:
+        +materialized: incremental
+      hub_pizza:
+        +materialized: incremental
+      lnk_order_pizza:
+        +materialized: incremental
+      sat_order:
+        +materialized: incremental
+      sat_pizza:
+        +materialized: incremental
+      sat_order_pizza:
+        +materialized: incremental
+      ref_pizza_type:
+        +materialized: table
     l_30_data_marts:
       +schema: 'data_marts'
       +materialized: view

@@ -2,14 +2,13 @@
 source_model: 'v_src_brz_order_details'
 derived_columns:
   RECORD_SOURCE: '!SEED_ORDER_DETAILS'
-  LOAD_DATETIME: 'CURRENT_TIMESTAMP'
+  LOAD_DATETIME: "'{{ run_started_at.isoformat() }}'::timestamptz"
 hashed_columns:
   HUB_ORDER_KEY: 'order_id'
   HUB_PIZZA_KEY: 'pizza_id'
   LNK_ORDER_PIZZA_KEY:
-    columns:
-      - 'order_id'
-      - 'pizza_id'
+    - 'order_id'
+    - 'pizza_id'
   SAT_ORDER_PIZZA_HASHDIFF:
     is_hashdiff: true
     columns:

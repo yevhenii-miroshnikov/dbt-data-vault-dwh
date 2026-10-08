@@ -1,0 +1,87 @@
+version: 2
+
+models:
+  - name: v_stg_orders
+    description: "Order source attributes enriched with Raw Vault keys and load metadata."
+    columns:
+      - name: HUB_ORDER_KEY
+        description: "Generated hash key for the source order identity."
+        data_tests:
+          - not_null
+      - name: SAT_ORDER_HASHDIFF
+        description: "Generated hashdiff for the order date and time payload."
+        data_tests:
+          - not_null
+      - name: LOAD_DATETIME
+        description: "Batch load timestamp used as the Raw Vault source LDTS."
+        data_tests:
+          - not_null
+      - name: RECORD_SOURCE
+        description: "Source identifier used for Raw Vault lineage."
+        data_tests:
+          - not_null
+
+  - name: v_stg_order_details
+    description: "Order detail source rows enriched with parent keys, association key, hashdiff, and load metadata."
+    columns:
+      - name: HUB_ORDER_KEY
+        description: "Generated hash key for the parent order."
+        data_tests:
+          - not_null
+      - name: HUB_PIZZA_KEY
+        description: "Generated hash key for the parent pizza SKU."
+        data_tests:
+          - not_null
+      - name: LNK_ORDER_PIZZA_KEY
+        description: "Generated hash key for the order-to-pizza association."
+        data_tests:
+          - not_null
+      - name: SAT_ORDER_PIZZA_HASHDIFF
+        description: "Generated hashdiff for the order detail identifier and quantity payload."
+        data_tests:
+          - not_null
+      - name: LOAD_DATETIME
+        description: "Batch load timestamp used as the Raw Vault source LDTS."
+        data_tests:
+          - not_null
+      - name: RECORD_SOURCE
+        description: "Source identifier used for Raw Vault lineage."
+        data_tests:
+          - not_null
+
+  - name: v_stg_pizzas
+    description: "Pizza SKU source attributes enriched with Raw Vault keys and load metadata."
+    columns:
+      - name: HUB_PIZZA_KEY
+        description: "Generated hash key for the source pizza SKU identity."
+        data_tests:
+          - not_null
+      - name: SAT_PIZZA_HASHDIFF
+        description: "Generated hashdiff for the recipe reference, size, and price payload."
+        data_tests:
+          - not_null
+      - name: LOAD_DATETIME
+        description: "Batch load timestamp used as the Raw Vault source LDTS."
+        data_tests:
+          - not_null
+      - name: RECORD_SOURCE
+        description: "Source identifier used for Raw Vault lineage."
+        data_tests:
+          - not_null
+
+  - name: v_stg_pizza_types
+    description: "Pizza type reference attributes enriched with load metadata."
+    columns:
+      - name: pizza_type_id
+        description: "Reference identity used to load the current pizza type catalog."
+        data_tests:
+          - not_null
+          - unique
+      - name: LOAD_DATETIME
+        description: "Batch load timestamp supplied to the reference load."
+        data_tests:
+          - not_null
+      - name: RECORD_SOURCE
+        description: "Source identifier used for reference data lineage."
+        data_tests:
+          - not_null

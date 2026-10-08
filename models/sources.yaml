@@ -2,10 +2,83 @@ version: 2
 
 sources:
   - name: source_seed_db
-    database: dbt_demo_team_a
-    schema: dbt_demo_team_a_bronze_db
+    database: "{{ env_var('DBT_SOURCE_DATABASE', target.database) }}"
+    schema: "{{ env_var('DBT_SOURCE_SCHEMA', target.schema ~ '_bronze_db') }}"
     tables:
       - name: orders
+        description: "Source records identifying customer orders."
+        columns:
+          - name: order_id
+            description: "Source identity for one order."
+            data_tests:
+              - not_null
+              - unique
       - name: order_details
+        description: "Source order line items, including the associated order, pizza SKU, and quantity."
+        data_tests:
+          - dbt_utils.unique_combination_of_columns:
+              arguments:
+                combination_of_columns:
+                  - order_id
+                  - pizza_id
+        columns:
+          - name: order_details_id
+            description: "Source identity for one order line item."
+            data_tests:
+              - not_null
+              - unique
+          - name: order_id
+            description: "Order identity referenced by this line item."
+            data_tests:
+              - not_null
+              - relationships:
+                  arguments:
+                    to: source('source_seed_db', 'orders')
+                    field: order_id
+          - name: pizza_id
+            description: "Pizza SKU identity referenced by this line item."
+            data_tests:
+              - not_null
+              - relationships:
+                  arguments:
+                    to: source('source_seed_db', 'pizzas')
+                    field: pizza_id
+          - name: quantity
+            description: "Quantity recorded on the source line item."
+            data_tests:
+              - not_null
       - name: pizzas
+        description: "Source catalog of pizza SKUs and their recipe, size, and price attributes."
+        columns:
+          - name: pizza_id
+            description: "Source identity for one pizza SKU."
+            data_tests:
+              - not_null
+              - unique
+          - name: pizza_type_id
+            description: "Optional recipe/type identity referenced by the pizza SKU."
+            data_tests:
+              - relationships:
+                  arguments:
+                    to: source('source_seed_db', 'pizza_types')
+                    field: pizza_type_id
+          - name: size
+            description: "Pizza size supplied for the SKU."
+            data_tests:
+              - not_null
+          - name: price
+            description: "Unit price supplied for the SKU."
+            data_tests:
+              - not_null
       - name: pizza_types
+        description: "Source catalog of pizza recipes and descriptive attributes."
+        columns:
+          - name: pizza_type_id
+            description: "Source identity for one pizza recipe/type."
+            data_tests:
+              - not_null
+              - unique
+          - name: name
+            description: "Recipe/type name supplied by the source."
+            data_tests:
+              - not_null

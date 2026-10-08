@@ -1,36 +1,226 @@
 version: 2
+
 models:
   - name: hub_order
+    description: "Hub containing one row per distinct source order business key."
     columns:
       - name: HUB_ORDER_KEY
-        tests:
+        description: "Hash key identifying the order in the Raw Data Vault."
+        data_tests:
           - unique
           - not_null
+      - name: order_id
+        description: "Source business key identifying the order."
+        data_tests:
+          - not_null
+      - name: LOAD_DATETIME
+        description: "Batch load timestamp recorded when the order key is first loaded."
+        data_tests:
+          - not_null
+      - name: RECORD_SOURCE
+        description: "Source system or input feed that supplied the order key."
+        data_tests:
+          - not_null
+
   - name: hub_pizza
+    description: "Hub containing one row per distinct pizza SKU business key."
     columns:
       - name: HUB_PIZZA_KEY
-        tests:
+        description: "Hash key identifying the pizza SKU in the Raw Data Vault."
+        data_tests:
           - unique
           - not_null
+      - name: pizza_id
+        description: "Source business key identifying the pizza SKU."
+        data_tests:
+          - not_null
+      - name: LOAD_DATETIME
+        description: "Batch load timestamp recorded when the pizza key is first loaded."
+        data_tests:
+          - not_null
+      - name: RECORD_SOURCE
+        description: "Source system or input feed that supplied the pizza key."
+        data_tests:
+          - not_null
+
   - name: lnk_order_pizza
+    description: "Link representing an association between an order and a pizza SKU. The model does not guarantee a distinct transaction line-item grain."
     columns:
       - name: LNK_ORDER_PIZZA_KEY
-        tests:
+        description: "Hash key identifying the order-to-pizza association."
+        data_tests:
           - unique
           - not_null
       - name: HUB_ORDER_KEY
-        tests:
+        description: "Hash key of the associated order Hub record."
+        data_tests:
+          - not_null
           - relationships:
-              to: ref('hub_order')
-              field: HUB_ORDER_KEY
+              arguments:
+                to: ref('hub_order')
+                field: HUB_ORDER_KEY
       - name: HUB_PIZZA_KEY
-        tests:
+        description: "Hash key of the associated pizza SKU Hub record."
+        data_tests:
+          - not_null
           - relationships:
-              to: ref('hub_pizza')
-              field: HUB_PIZZA_KEY
-  - name: sat_pizza
+              arguments:
+                to: ref('hub_pizza')
+                field: HUB_PIZZA_KEY
+      - name: LOAD_DATETIME
+        description: "Batch load timestamp recorded when the association is first loaded."
+        data_tests:
+          - not_null
+      - name: RECORD_SOURCE
+        description: "Source system or input feed that supplied the association."
+        data_tests:
+          - not_null
+
+  - name: sat_order
+    description: "Satellite preserving historical order date and time context for each order Hub key."
+    data_tests:
+      - dbt_utils.unique_combination_of_columns:
+          arguments:
+            combination_of_columns:
+              - HUB_ORDER_KEY
+              - LOAD_DATETIME
     columns:
+      - name: HUB_ORDER_KEY
+        description: "Parent order Hub hash key."
+        data_tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('hub_order')
+                field: HUB_ORDER_KEY
+      - name: LOAD_DATETIME
+        description: "Load timestamp that distinguishes historical versions for this parent key."
+        data_tests:
+          - not_null
+      - name: SAT_ORDER_HASHDIFF
+        description: "Hashdiff of the order date and time payload used to detect change."
+        data_tests:
+          - not_null
+      - name: order_date
+        description: "Calendar date associated with the order."
+        data_tests:
+          - not_null
+      - name: order_time
+        description: "Time of day associated with the order."
+        data_tests:
+          - not_null
+      - name: RECORD_SOURCE
+        description: "Source system or input feed that supplied the order context."
+        data_tests:
+          - not_null
+
+  - name: sat_pizza
+    description: "Satellite preserving historical recipe reference, size, and price context for each pizza SKU."
+    data_tests:
+      - dbt_utils.unique_combination_of_columns:
+          arguments:
+            combination_of_columns:
+              - HUB_PIZZA_KEY
+              - LOAD_DATETIME
+    columns:
+      - name: HUB_PIZZA_KEY
+        description: "Parent pizza Hub hash key."
+        data_tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('hub_pizza')
+                field: HUB_PIZZA_KEY
+      - name: LOAD_DATETIME
+        description: "Load timestamp that distinguishes historical versions for this parent key."
+        data_tests:
+          - not_null
+      - name: SAT_PIZZA_HASHDIFF
+        description: "Hashdiff of the pizza type, size, and price payload used to detect change."
+        data_tests:
+          - not_null
+      - name: pizza_type_id
+        description: "Optional reference to a pizza recipe/type in the current reference catalog."
+        data_tests:
+          - relationships:
+              arguments:
+                to: ref('ref_pizza_type')
+                field: pizza_type_id
       - name: size
-        tests:
+        description: "Pizza size code supplied by the source."
+        data_tests:
+          - not_null
           - accepted_values:
-              values: [ 'S', 'M', 'L', 'XL', 'XXL' ]
+              arguments:
+                values: ['S', 'M', 'L', 'XL', 'XXL']
+      - name: price
+        description: "Unit price supplied for this pizza SKU version."
+        data_tests:
+          - not_null
+      - name: RECORD_SOURCE
+        description: "Source system or input feed that supplied the pizza context."
+        data_tests:
+          - not_null
+
+  - name: sat_order_pizza
+    description: "Satellite preserving historical descriptive context for an order-to-pizza association."
+    data_tests:
+      - dbt_utils.unique_combination_of_columns:
+          arguments:
+            combination_of_columns:
+              - LNK_ORDER_PIZZA_KEY
+              - LOAD_DATETIME
+    columns:
+      - name: LNK_ORDER_PIZZA_KEY
+        description: "Parent order-pizza Link hash key."
+        data_tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('lnk_order_pizza')
+                field: LNK_ORDER_PIZZA_KEY
+      - name: LOAD_DATETIME
+        description: "Load timestamp that distinguishes historical versions for this parent key."
+        data_tests:
+          - not_null
+      - name: SAT_ORDER_PIZZA_HASHDIFF
+        description: "Hashdiff of the order detail identifier and quantity payload used to detect change."
+        data_tests:
+          - not_null
+      - name: order_details_id
+        description: "Source order-detail identifier carried as satellite payload."
+        data_tests:
+          - not_null
+      - name: quantity
+        description: "Quantity recorded for the order-to-pizza association version."
+        data_tests:
+          - not_null
+      - name: RECORD_SOURCE
+        description: "Source system or input feed that supplied the association context."
+        data_tests:
+          - not_null
+
+  - name: ref_pizza_type
+    description: "Current, non-historised reference catalog of pizza recipe/type attributes."
+    columns:
+      - name: pizza_type_id
+        description: "Natural key identifying a pizza recipe/type in the current catalog."
+        data_tests:
+          - unique
+          - not_null
+      - name: ldts
+        description: "Load timestamp supplied with the current reference catalog row."
+        data_tests:
+          - not_null
+      - name: rscr
+        description: "Source record identifier supplied with the current reference catalog row."
+        data_tests:
+          - not_null
+      - name: name
+        description: "Pizza recipe/type name in the reference catalog."
+        data_tests:
+          - not_null
+      - name: category
+        description: "Optional category label for the pizza recipe/type."
+      - name: ingredients
+        description: "Optional ingredient description for the pizza recipe/type."

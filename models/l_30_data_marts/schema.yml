@@ -1,0 +1,67 @@
+version: 2
+
+models:
+  - name: obt_pizza_sales
+    description: >-
+      Current-state analytical view with one row per source order_details_id.
+      It enriches each sale with the latest available descriptive state from
+      Raw Vault Satellites. Price and total_price use the latest available
+      Pizza SKU price, not a guaranteed transaction-time price; the source
+      does not provide price_at_sale or business-valid price history. Missing
+      pizza type reference data does not remove the sale row; reference-derived
+      descriptive fields may be null.
+    columns:
+      - name: order_details_id
+        description: Unique source line-item identifier and row grain of this view.
+        data_tests:
+          - not_null
+          - unique
+
+      - name: order_id
+        description: Business identifier of the order containing this line item.
+        data_tests:
+          - not_null
+
+      - name: order_datetime
+        description: Timestamp assembled from the source order_date and order_time; the source contract does not define a timezone.
+        data_tests:
+          - not_null
+
+      - name: pizza_id
+        description: Business identifier of the ordered Pizza SKU.
+        data_tests:
+          - not_null
+
+      - name: pizza_name
+        description: Name from the current pizza type reference catalog; nullable when the reference is absent.
+
+      - name: category
+        description: Category from the current pizza type reference catalog; nullable when the reference is absent or category is unknown.
+
+      - name: size
+        description: Size of the Pizza SKU from its latest available Satellite state.
+        data_tests:
+          - not_null
+
+      - name: price
+        description: Latest available catalog price for the Pizza SKU from sat_pizza; this is not guaranteed to be the price at the time of the order.
+        data_tests:
+          - not_null
+
+      - name: quantity
+        description: Quantity recorded for the source line item.
+        data_tests:
+          - not_null
+
+      - name: total_price
+        description: Current-state calculated amount (quantity multiplied by the latest available Pizza SKU price). The source has no separate price_at_sale or business-valid price history, so this is not guaranteed historical transaction revenue.
+        data_tests:
+          - not_null
+
+      - name: ingredients
+        description: Ingredients from the current pizza type reference catalog; nullable when the reference is absent or ingredients are unknown.
+
+      - name: record_load_datetime
+        description: Maximum technical load timestamp across the Order Hub and latest Order Satellite, Pizza Hub and latest Pizza Satellite, and Order-Pizza Link and latest Order-Pizza Satellite. Reference catalog loads are excluded.
+        data_tests:
+          - not_null
