@@ -30,6 +30,7 @@ This project was developed as part of a university Database Technologies course.
 - [dbt Documentation and Lineage](#dbt-documentation-and-lineage)
 - [Reproducibility](#reproducibility)
 - [Assumptions and Limitations](#assumptions-and-limitations)
+- [Dataset and License](#dataset-and-license)
 - [Kurzbeschreibung (DE)](#kurzbeschreibung-de)
 - [Contact](#contact)
 
@@ -273,6 +274,12 @@ Generated documentation artifacts are written to `target/` and are intentionally
 - Raw Vault LDTS is a batch load timestamp, not source event time or business-valid time.
 - Gold `obt_pizza_sales` enriches sales with the latest available descriptive state and catalog price; it is not an as-of revenue fact.
 - A multidimensional Star Schema is a possible future extension; it is not part of the current implementation.
+
+## Dataset and License
+
+This project uses the **Pizza Place Sales** sample dataset available through the [Maven Analytics Data Playground](https://mavenanalytics.io/data-playground/pizza-place-sales). Maven Analytics credits the dataset to Vincent Arel-Bundock (Rdatasets) and lists its license as Public Domain.
+
+The MIT License in this repository applies to the project code and documentation.
 
 <a id="kurzbeschreibung-de"></a>
 ## 🇩🇪 Kurzbeschreibung
