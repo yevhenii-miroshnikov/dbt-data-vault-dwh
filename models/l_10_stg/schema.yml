@@ -4,6 +4,12 @@ models:
   - name: v_stg_orders
     description: "Order source attributes enriched with Raw Vault keys and load metadata."
     columns:
+      - name: order_id
+        description: "Business identifier of the source order."
+      - name: order_date
+        description: "Order date provided by the source."
+      - name: order_time
+        description: "Order time provided by the source."
       - name: HUB_ORDER_KEY
         description: "Generated hash key for the source order identity."
         data_tests:
@@ -22,8 +28,19 @@ models:
           - not_null
 
   - name: v_stg_order_details
-    description: "Order detail source rows enriched with parent keys, association key, hashdiff, and load metadata."
+    description: >-
+      Order detail source rows enriched with Order and Pizza SKU hash keys, an
+      Order-Pizza association hash key, a Satellite hashdiff, and batch load
+      metadata. The association key is derived from (order_id, pizza_id).
     columns:
+      - name: order_details_id
+        description: "Source identifier for an order detail record."
+      - name: order_id
+        description: "Business identifier of the associated order."
+      - name: pizza_id
+        description: "Pizza SKU identifier associated with the order."
+      - name: quantity
+        description: "Quantity recorded for this order detail record."
       - name: HUB_ORDER_KEY
         description: "Generated hash key for the parent order."
         data_tests:
@@ -52,6 +69,14 @@ models:
   - name: v_stg_pizzas
     description: "Pizza SKU source attributes enriched with Raw Vault keys and load metadata."
     columns:
+      - name: pizza_id
+        description: "Business identifier of the Pizza SKU."
+      - name: pizza_type_id
+        description: "Source reference to the pizza type catalog."
+      - name: size
+        description: "Pizza size provided by the source."
+      - name: price
+        description: "Catalog price provided by the source for the Pizza SKU."
       - name: HUB_PIZZA_KEY
         description: "Generated hash key for the source pizza SKU identity."
         data_tests:
@@ -77,6 +102,12 @@ models:
         data_tests:
           - not_null
           - unique
+      - name: name
+        description: "Pizza type name provided by the source."
+      - name: category
+        description: "Pizza category provided by the source."
+      - name: ingredients
+        description: "Ingredient description provided by the source."
       - name: LOAD_DATETIME
         description: "Batch load timestamp supplied to the reference load."
         data_tests:

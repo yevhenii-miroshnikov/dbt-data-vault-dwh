@@ -1,7 +1,7 @@
 import pandas as pd
 from ydata_profiling import ProfileReport
 
-# Словник файлів і шляхів до них
+# Dataset files and their paths
 datasets = {
     "orders": "seeds/data/orders.csv",
     "order_details": "seeds/data/order_details.csv",
@@ -12,12 +12,12 @@ datasets = {
 for name, path in datasets.items():
     df = pd.read_csv(path, encoding="latin1")
 
-    # Швидкий розрахунок у термінал (без очікування генерації всього HTML)
+    # Print a concise summary without waiting for HTML report generation.
     print(f"=== {name}.csv ===")
-    print(f"Total records (рядків): {len(df)}")
-    print(f"Empty values (порожніх значень): {df.isnull().sum().sum()}")
-    print(f"Duplicates (повних дублікатів): {df.duplicated().sum()}\n")
+    print(f"Total records: {len(df)}")
+    print(f"Missing values: {df.isnull().sum().sum()}")
+    print(f"Full-row duplicates: {df.duplicated().sum()}\n")
 
-    # Генерація детального інтерактивного звіту
+    # Generate a detailed interactive report.
     profile = ProfileReport(df, title=f"{name} Profiling", minimal=True)
     profile.to_file(f"{name}_report.html")

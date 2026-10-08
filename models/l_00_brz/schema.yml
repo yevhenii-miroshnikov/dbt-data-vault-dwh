@@ -1,0 +1,48 @@
+version: 2
+
+models:
+  - name: v_src_brz_orders
+    description: "Bronze view exposing source order identifiers and date/time attributes for staging."
+    columns:
+      - name: order_id
+        description: "Source identifier for an order."
+      - name: order_date
+        description: "Order date provided by the source."
+      - name: order_time
+        description: "Order time provided by the source."
+
+  - name: v_src_brz_order_details
+    description: "Bronze view exposing source order detail records and selected attributes for staging."
+    columns:
+      - name: order_details_id
+        description: "Source identifier for an order detail record."
+      - name: order_id
+        description: "Identifier of the order associated with this record."
+      - name: pizza_id
+        description: "Pizza SKU identifier associated with this order detail record."
+      - name: quantity
+        description: "Quantity recorded for this order detail record."
+
+  - name: v_src_brz_pizzas
+    description: "Bronze view exposing source Pizza SKU attributes for staging."
+    columns:
+      - name: pizza_id
+        description: "Source identifier for a Pizza SKU."
+      - name: pizza_type_id
+        description: "Source reference to the pizza type catalog."
+      - name: size
+        description: "Pizza size provided by the source."
+      - name: price
+        description: "Catalog price provided by the source for the Pizza SKU."
+
+  - name: v_src_brz_pizza_types
+    description: "Bronze view exposing source pizza type reference attributes for staging."
+    columns:
+      - name: pizza_type_id
+        description: "Source identifier for a pizza type."
+      - name: name
+        description: "Pizza type name provided by the source."
+      - name: category
+        description: "Pizza category provided by the source."
+      - name: ingredients
+        description: "Ingredient description provided by the source."

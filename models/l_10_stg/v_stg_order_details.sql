@@ -2,6 +2,7 @@
 source_model: 'v_src_brz_order_details'
 derived_columns:
   RECORD_SOURCE: '!SEED_ORDER_DETAILS'
+  {# Within one dbt invocation, run_started_at provides a shared batch LDTS across staging models. #}
   LOAD_DATETIME: "'{{ run_started_at.isoformat() }}'::timestamptz"
 hashed_columns:
   HUB_ORDER_KEY: 'order_id'
