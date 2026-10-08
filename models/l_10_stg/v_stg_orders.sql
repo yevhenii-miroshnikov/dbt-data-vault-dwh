@@ -2,7 +2,7 @@
 source_model: 'v_src_brz_orders'
 derived_columns:
   RECORD_SOURCE: '!SEED_ORDERS'
-  LOAD_DATETIME: 'CURRENT_TIMESTAMP'
+  LOAD_DATETIME: "'{{ run_started_at.isoformat() }}'::timestamptz"
 hashed_columns:
   HUB_ORDER_KEY: 'order_id'
   SAT_ORDER_HASHDIFF:

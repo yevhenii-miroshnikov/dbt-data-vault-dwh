@@ -1,0 +1,12 @@
+dbt_with_datavault_demo:
+  target: dev
+  outputs:
+    dev:
+      type: postgres
+      host: "{{ env_var('DBT_PG_HOST', 'localhost') }}"
+      port: "{{ env_var('DBT_PG_PORT', '5432') | int }}"
+      dbname: "{{ env_var('DBT_PG_DATABASE') }}"
+      schema: "{{ env_var('DBT_PG_SCHEMA') }}"
+      user: "{{ env_var('DBT_PG_USER') }}"
+      password: "{{ env_var('DBT_PG_PASSWORD') }}"
+      threads: 4

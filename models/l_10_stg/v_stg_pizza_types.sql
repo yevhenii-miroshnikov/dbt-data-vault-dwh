@@ -2,7 +2,7 @@
 source_model: 'v_src_brz_pizza_types'
 derived_columns:
   RECORD_SOURCE: '!SEED_PIZZA_TYPES'
-  LOAD_DATETIME: 'CURRENT_TIMESTAMP'
+  LOAD_DATETIME: "'{{ run_started_at.isoformat() }}'::timestamptz"
 {%- endset -%}
 
 {% set metadata_dict = fromyaml(yaml_metadata) %}
